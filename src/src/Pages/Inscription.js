@@ -35,6 +35,17 @@ const Inscription = () => {
         setLoading(false);
         return;
       }
+      const regexEmail = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+      if (!regexEmail.test(email)) {
+        setError('L\'email n\'est pas valide');
+        setLoading(false);
+        return;
+      }
+      if (!password) {  
+        setError('Le mot de passe est obligatoire');
+        setLoading(false);
+        return;
+      }
       if (password.length < 8) {
         setError('Le mot de passe doit faire au moins 8 caractères');
         setLoading(false);
@@ -76,7 +87,7 @@ const Inscription = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          <button type="submit" className="bg-blue-700 text-white p-4 m-4" disabled={loading}>
+          <button type="submit" id="submit" className="bg-blue-700 text-white p-4 m-4" disabled={loading}>
             {loading ? 'S\'inscrire...' : 'S\'inscrire'}
           </button>
           {error && <p className="text-white">{error}</p>}

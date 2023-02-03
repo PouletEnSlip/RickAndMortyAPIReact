@@ -42,7 +42,7 @@ const FavoritesList = () => {
       if (user) {
         const db = firebase.firestore();
         const query = await db.collection('favoris').where('user_id', '==', user.email).get();
-        if (query.docs.length > 0) {
+        if (query.docs.length >= 0) {
           setFavorites(query.docs.map(doc => doc.data()));
         }
       }
@@ -51,23 +51,26 @@ const FavoritesList = () => {
     }
   }
 
-  async function removeFromFavorites(favorite) {
+  async function removeFromFavorites(characterId) {
     try {
       const user = firebase.auth().currentUser;
       if (user) {
         const db = firebase.firestore();
-        const query = await db.collection('favoris').where('character_id', '==', favorite).where('user_id', '==', user.email).get();
-        if (query.docs.length > 0) {
-          query.docs.forEach(doc => {
-            doc.ref.delete();
-          });
-        }
+        const query = await db
+          .collection('favoris')
+          .where('user_id', '==', user.email)
+          .where('character_id', '==', characterId)
+          .get();
+        query.docs.forEach(async doc => {
+          await doc.ref.delete();
+        });
+        getFavorites();
       }
-      window.location.reload();
     } catch (error) {
       alert(error);
     }
-  }
+  }  
+
 
   return (
     <main className="container mx-auto">
@@ -76,6 +79,7 @@ const FavoritesList = () => {
         <h1 className="text-2xl text-dark-heading dark:text-light-heading md:text-4xl xl:text-5xl xl:leading-tight font-bold">
           Favoris
         </h1>
+        {favorites.length > 0 ? (
         <div className="inline-block m-4">
         {favorites.map(favorite => (
           <div className="block m-auto mb-16 light:text-black dark:text-white">
@@ -88,6 +92,9 @@ const FavoritesList = () => {
           </div>
         ))}
         </div>
+        ) : (
+          <h2 className="text-white m-4">Pas de favoris</h2>
+        )}
       </section>
       ) : null }
     </main>

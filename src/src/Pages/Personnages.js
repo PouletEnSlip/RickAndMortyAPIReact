@@ -24,6 +24,7 @@ function Personnages() {
   const [user, setUser] = useState(null);
   const [characters, setCharacters] = useState([]);
   const [page, setPage] = useState(1);
+  const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -36,6 +37,17 @@ function Personnages() {
     const unsubscribe = firebase.auth().onAuthStateChanged(user => {
       if (user) {
         setUser(user);
+        const db = firebase.firestore();
+        db.collection('favoris')
+          .where('user_id', '==', user.email)
+          .get()
+          .then(querySnapshot => {
+            const favorites = [];
+            querySnapshot.forEach(doc => {
+              favorites.push(doc.data().character_id);
+            });
+            setFavorites(favorites);
+          });
       } else {
         setUser(null);
       }
@@ -58,14 +70,13 @@ function Personnages() {
         const db = firebase.firestore();
         const query = await db.collection('favoris').where('character_id', '==', character.id).where('user_id', '==', user.email).get();
         if (query.docs.length > 0) {
-          alert('déjà dans les favoris');
           return;
         }
         db.collection('favoris').add({
           character_id: character.id,
           user_id: user.email
         });
-        alert('Ajouté aux favoris !');
+        setFavorites([...favorites, character.id]);
       }
     } catch (error) {
       alert(error);
@@ -94,7 +105,9 @@ function Personnages() {
               <p>Type : {character.type || 'Non spécifié'}</p>
               <p>Location : {character.location.name}</p>
               {user ? (
-                <button className="p-4 block bg-blue-700 w-64 mt-4 m-auto" onClick={() => addToFavorites(character)}>
+                <button className="p-4 block bg-blue-700 w-64 mt-4 m-auto disabled:opacity-25" 
+                  onClick={() => addToFavorites(character)}
+                  disabled={favorites.includes(character.id)}>
                   Mettre en favoris ❤️
                 </button>
               ) : null}
