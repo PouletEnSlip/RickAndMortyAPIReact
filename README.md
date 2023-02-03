@@ -5,4 +5,4 @@ Data from [The Rick and Morty API](https://rickandmortyapi.com/).
 
 ![0](https://github.com/PouletEnSlip/RickAndMortyAPIReact/blob/main/image.png)
 
-Made by **PouletEnSlip** © 2023 - All Rights Reserved
+© 2023 - contact @ leoseguin.fr
